@@ -23,19 +23,20 @@ app.get('/', async (req, res) => {
 
 app.post('/', async (req, res) => {
   try {
+    console.log(req.body)
     const prompt = req.body.prompt
 
     const response = await openai.createCompletion({
       model: 'text-davinci-003',
       prompt: `${prompt}`,
       temperature: 0,
-      max_tokens: 80, //lunghezza della risposta
+      max_tokens: 40, //lunghezza della risposta
       top_p: 1,
       frequency_penalty: 0.5, // 0 risponde alla stessa maniera ad una simile domanda
       presence_penalty: 0,
     })
 
-    res.status(200).send({
+    res.status(200).json({
       bot: response.data.choices[0].text
     })
   } catch (error) {

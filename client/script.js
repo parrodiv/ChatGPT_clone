@@ -19,6 +19,7 @@ const loader = (element) => {
 }
 
 const typeText = (element, text) => {
+  element.innerHTML = ''
   let index = 0
 
   console.log(text.length)
@@ -27,7 +28,7 @@ const typeText = (element, text) => {
   let interval = setInterval(() => {
     if (index < text.length) {
       // still typing
-      element.innerHTML += text.chartAt(index)
+      element.innerHTML += text.charAt(index)
       // text.chartAt gets the caracter under a specific index in the text that AI is going to return
       index++
     } else {
@@ -88,6 +89,32 @@ async function handleSubmit(e) {
 
   loader(messageBotDiv)
 
+  // fetch data from server -> bot's response
+
+  const response = await fetch('http://localhost:5000', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prompt: data.get('prompt')
+    })
+  })
+
+  clearInterval(loadInterval)
+
+  if(response.ok) {
+    const data = await response.json()
+    const parsedData = data.bot.trim() //trim removes whitespaces
+
+    typeText(messageBotDiv, parsedData)
+  } else {
+    const err = await response.text()
+
+    messageBotDiv.innnerHTML = "Something went wrong"
+
+    alert(err)
+  }
 }
 
 form.addEventListener('submit', handleSubmit)
